@@ -40,12 +40,16 @@ class scm::repo (
       # deb [arch=amd64] http://archive.cloudera.com/cdh4/ubuntu/lucid/amd64/cm lucid-cm4 contrib      
       include apt
       apt::source { 'cloudera-manager':
-        location    => "[arch=${::architecture}] ${scm::params::cm_reposerver}${scm::params::cm_aptpath}",
+        location    => "[arch=${::architecture}] ${cm_reposerver}${scm::params::cm_aptpath}",
         release     => "${scm::params::cm_aptrelease}",
         repos       => "${scm::params::cm_aptrepos}",
         include_src => true,
-        notify      => Exec["apt-update"]
+        notify      => [Exec["apt-update"], Exec["cloudera-manager-repo-key"]]
       }
+      exec { 'cloudera-manager-repo-key':
+        command => "curl -s ${cm_reposerver}${scm::params::cm_aptpath}${scm::params::cm_archive_key} | sudo apt-key add -",
+        refreshonly => true,
+      }      
       exec { "apt-update":
         command => "/usr/bin/apt-get update",
         refreshonly => true,

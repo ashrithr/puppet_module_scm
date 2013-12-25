@@ -15,6 +15,7 @@ class scm::params {
       $cm_aptpath = "/cm4/ubuntu/${::lsbdistcodename}/${::architecture}/cm"
       $cm_aptrelease = "${::lsbdistcodename}-cm4"
       $cm_aptrepos = " contrib"
+      $cm_archive_key = "/archive.key"
     }
     default: {
       fail("Module ${::module} is not supported on ${::operatingsystem}")

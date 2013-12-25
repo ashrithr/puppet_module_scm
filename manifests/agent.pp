@@ -10,6 +10,9 @@ class scm::agent (
   ) inherits scm::params {
   validate_bool($autoupgrade)
 
+  require java
+  require scm::repo
+
   case $ensure {
     /(present)/: {
       if $autoupgrade == true {
@@ -45,10 +48,17 @@ class scm::agent (
     ensure => $package_ensure,
   }
 
+  file { "/etc/default/cloudera-scm-agent":
+    ensure => $file_ensure,
+    content => template('scm/cloudera-scm-agent.erb'),
+    require => Package['cloudera-manager-agent'],
+    notify => Service['cloudera-scm-agent']
+  }  
+
   file { 'scm-config.ini':
     ensure  => $file_ensure,
     path    => '/etc/cloudera-scm-agent/config.ini',
-    content => template('cloudera/scm-config.ini.erb'),
+    content => template('scm/scm-config.ini.erb'),
     require => Package['cloudera-manager-agent'],
     notify  => Service['cloudera-scm-agent'],
   }
